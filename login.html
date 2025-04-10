@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Study Buddy - Login</title>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    /* Global Styles and Cool Colors */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    .login-container {
+      background: rgba(0,0,0,0.5);
+      padding: 40px;
+      border-radius: 12px;
+      width: 360px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 2rem;
+    }
+    form {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      background: #76c7c0;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #fff;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #5bb0a9;
+    }
+    .toggle-btn {
+      background: transparent;
+      border: none;
+      color: #fff;
+      text-decoration: underline;
+      cursor: pointer;
+      margin-top: 10px;
+      display: block;
+      text-align: center;
+    }
+    .error-msg {
+      color: #ff8080;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+          <h2>Login</h2>
+          <!-- Your login form code goes here -->
+        </div>
+      </div>
+  <div class="login-container">
+    <h1 id="form-title">Login</h1>
+    <div id="error" class="error-msg"></div>
+    <form id="loginForm">
+      <label for="username">Username</label>
+      <input type="text" id="username" placeholder="Enter Username" required>
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter Password" required>
+      <button type="submit" id="submitBtn">Login</button>
+    </form>
+    <button class="toggle-btn" id="toggleForm">Don't have an account? Register</button>
+  </div>
+
+  <script>
+    // Use localStorage to simulate a database for users.
+    const toggleBtn = document.getElementById("toggleForm");
+    const formTitle = document.getElementById("form-title");
+    const submitBtn = document.getElementById("submitBtn");
+    const errorMsg = document.getElementById("error");
+    let isRegistering = false;
+
+    // Load users from localStorage (or initialize an empty object)
+    function getUsers() {
+      return JSON.parse(localStorage.getItem("users") || "{}");
+    }
+
+    // Save users back to localStorage
+    function saveUsers(users) {
+      localStorage.setItem("users", JSON.stringify(users));
+    }
+
+    // Toggle the form between Login and Register
+    toggleBtn.addEventListener("click", () => {
+      isRegistering = !isRegistering;
+      if(isRegistering) {
+        formTitle.innerText = "Register";
+        submitBtn.innerText = "Register";
+        toggleBtn.innerText = "Already have an account? Login";
+      } else {
+        formTitle.innerText = "Login";
+        submitBtn.innerText = "Login";
+        toggleBtn.innerText = "Don't have an account? Register";
+      }
+      errorMsg.innerText = "";
+    });
+
+    document.getElementById("loginForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+      let users = getUsers();
+      
+      if(isRegistering) {
+        // Registration: Ensure unique username.
+        if(users[username]) {
+          errorMsg.innerText = "Username already exists. Choose a different one.";
+          return;
+        } else {
+          users[username] = { password, progress: {}, studyLogs: [], notes: [] };
+          saveUsers(users);
+          // Auto-login after registration.
+          localStorage.setItem("currentUser", username);
+          window.location.href = "dashboard.html";
+        }
+      } else {
+        // Login: Validate credentials.
+        if(users[username] && users[username].password === password) {
+          localStorage.setItem("currentUser", username);
+          window.location.href = "dashboard.html";
+        } else {
+          errorMsg.innerText = "Invalid username or password.";
+        }
+      }
+    });
+  </script>
+</body>
+</html>
